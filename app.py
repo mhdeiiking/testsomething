@@ -36,7 +36,7 @@ def create_bot():
         return {"result": "Error: Bot username already exists"}
     else:
         let = ''.join(random.choices(string.ascii_letters, k=30))
-        inte = ''.join(random.choices(string.digits,k=7))
+        inte = ''.join(random.choices(string.digits,k=13))
         token = f"{inte}:{let}"
         bot_info = {"username": bot_username, "name": bot_name, "token": token}
         bots_table.set(bot_username, bot_info)
