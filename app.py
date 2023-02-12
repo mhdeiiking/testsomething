@@ -8,56 +8,52 @@ from asSQL import Client
 from flask import Flask, request, jsonify
 
 
-users_db = Client("users")['users']
-bots_db = Client("bots")['bots']
-users_db.create_table()
-bots_db.create_table()
+from flask import Flask, request
+import asSQL
+from asSQL import Client
+import random
+import string
+
 app = Flask(__name__)
+users_table = Client("users")["users_table"]
+bots_table = Client("bots")["bots_table"]
+users_table.create_table()
+bots_table.create_table()
 @app.route('/create_bot', methods=['POST'])
 def create_bot():
-    # Get the bot name and username from the request
-    bot_name = request.json['bot_name']
-    bot_username = request.json['bot_username']
-    user_id = request.json['user_id']
+    bot_name = request.form.get('bot_name')
+    bot_username = request.form.get('bot_username')
+    user_id = request.form.get('user_id')
     
-    # Check if the bot username ends with "bot"
+    if not all([bot_name, bot_username, user_id]):
+        return {"result": "Error: Missing params"}
     if not bot_username.endswith("bot"):
-        return jsonify({"result": "Error: The bot username must end with 'bot'"})
-    
-    # Check if the bot username is already taken
-    if bots_db.key_exists(bot_username):
-        return jsonify({"result": "Error: The bot username is already taken"})
-    
-    # Generate a token for the bot
-    token = ''.join(random.choices(string.ascii_letters + string.digits, k=23))
-    
-    # Store the bot information in the bots database
-    bot_info = {
-        "name": bot_name,
-        "username": bot_username,
-        "token": token
-    }
-    bots_db.set(bot_username, bot_info)
-    
-    # Add the bot to the user's list of bots
-    if users_db.key_exists(user_id):
-        user_bots = users_db.get(user_id)
-        user_bots.append(bot_info)
-        users_db.set(user_id, user_bots)
+        return {"result": "Error: Bot username should end with 'bot'"}
+    if bots_table.key_exists(bot_username):
+        return {"result": "Error: Bot username already exists"}
     else:
-        users_db.set(user_id, [bot_info])
-    
-    # Return the created bot information
-    return jsonify({"result": bot_info})
+        token = ''.join(random.choices(string.digits + string.ascii_letters, k=30))
+        bot_info = {"username": bot_username, "name": bot_name, "token": token}
+        bots_table.set(bot_username, bot_info)
+        
+        if users_table.key_exists(user_id):
+            users_bots = users_table.get(user_id)
+            users_bots.append(bot_info)
+            users_table.set(user_id, users_bots)
+        else:
+            users_table.set(user_id, [bot_info])
+        
+        return {"result": bot_info}
 
-@app.route('/bot<token>/getme', methods=['GET'])
-def getme(token):
-    
-    if not bots_table.key_exists(token):
-        return jsonify({"result": "Unauthorized"}), 401
-    
-    bot_info = bots_table.get(token)
-    return jsonify({"result": bot_info}), 200
+@app.route('/getme', methods=['POST'])
+def getme():
+    token = request.form.get('token')
+    if not token:
+        return {"result": "Error: Missing params"}
+    for key, value in bots_table.get_all().items():
+        if value['token'] == token:
+            return {"result": value}
+    return {"result": "Unauthorized"}
 
 @app.route("/data/")
 def info():
