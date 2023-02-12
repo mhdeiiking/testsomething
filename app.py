@@ -21,9 +21,9 @@ users_table.create_table()
 bots_table.create_table()
 @app.route('/create_bot', methods=['POST'])
 def create_bot():
-    bot_name = request.json('bot_name')
-    bot_username = request.json('bot_username')
-    user_id = request.json('user_id')
+    bot_name = request.json['bot_name'] if request.json else request.form.get("bot_name")
+    bot_username = request.json['bot_username'] if request.json else request.form.get("bot_username")
+    user_id = request.json['user_id'] if request.json else request.form.get("user_id")
     if not user_id:
         return {"result": "user_id missing!"}
     if not bot_name:
