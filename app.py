@@ -21,9 +21,9 @@ users_table.create_table()
 bots_table.create_table()
 @app.route('/create_bot', methods=['POST'])
 def create_bot():
-    bot_name = request.form.get('bot_name')
-    bot_username = request.form.get('bot_username')
-    user_id = request.form.get('user_id')
+    bot_name = request.json('bot_name')
+    bot_username = request.json('bot_username')
+    user_id = request.json('user_id')
     if not user_id:
         return {"result": "user_id missing!"}
     if not bot_name:
@@ -35,7 +35,9 @@ def create_bot():
     if bots_table.key_exists(bot_username):
         return {"result": "Error: Bot username already exists"}
     else:
-        token = ''.join(random.choices(string.digits + string.ascii_letters, k=30))
+        let = ''.join(random.choices(string.ascii_letters, k=30))
+        inte = ''.join(random.choices(string.digits,k=7))
+        token = f"{inte}:{let}"
         bot_info = {"username": bot_username, "name": bot_name, "token": token}
         bots_table.set(bot_username, bot_info)
         
