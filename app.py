@@ -24,9 +24,12 @@ def create_bot():
     bot_name = request.form.get('bot_name')
     bot_username = request.form.get('bot_username')
     user_id = request.form.get('user_id')
-    
-    if not all([bot_name, bot_username, user_id]):
-        return {"result": "Error: Missing params"}
+    if not user_id:
+        return {"result": "user_id missing!"}
+    if not bot_name:
+        return {"result": "bot_name missing!"}
+    if not bot_username:
+        return {"result": "bot_username missing!"}
     if not bot_username.endswith("bot"):
         return {"result": "Error: Bot username should end with 'bot'"}
     if bots_table.key_exists(bot_username):
