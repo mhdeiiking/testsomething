@@ -4,4 +4,4 @@ gunicorn
 user_agent
 bs4
 lxml
-
+assql
