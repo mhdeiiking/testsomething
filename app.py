@@ -5,7 +5,7 @@ from telebot.types import InlineKeyboardButton as btn
 import os, json, requests, flask,time
 
 server = flask.Flask(__name__)
-bot = telebot.TeleBot("")
+bot = telebot.TeleBot("5907451098:AAGOWOVesPnBQzDLCU2SB0mnKQeLOUGx8d4",num_threads=20,skip_pending=True)
 @bot.message_handler(func=lambda m:True)
 def d(message):
     bot.reply_to(message,"hi")
