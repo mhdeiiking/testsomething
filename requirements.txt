@@ -3,5 +3,6 @@ requests
 gunicorn
 user_agent
 bs4
+pytelegrambotapi
 lxml
 assql
